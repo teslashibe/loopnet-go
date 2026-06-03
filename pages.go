@@ -2,8 +2,11 @@ package loopnet
 
 import (
 	"context"
+	"regexp"
 	"strings"
 )
+
+var titleRe = regexp.MustCompile(`(?is)<title>\s*(.*?)\s*</title>`)
 
 // GetPath fetches an arbitrary authenticated path under www.loopnet.com
 // and returns the raw HTML response.
