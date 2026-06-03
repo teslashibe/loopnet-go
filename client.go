@@ -115,7 +115,10 @@ func (c *Client) setCommonHeaders(req *http.Request, contentType string) {
 	req.Header.Set("User-Agent", ua)
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
-	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
+	// Deliberately do NOT set Accept-Encoding. net/http transparently adds
+	// "gzip" and decompresses the response only when it sets the header
+	// itself; setting it manually here disabled that, so every body came
+	// back as raw gzip/br bytes (breaking substring checks and page tools).
 	req.Header.Set("Referer", baseURL+"/")
 	req.Header.Set("Sec-Fetch-Dest", "document")
 	req.Header.Set("Sec-Fetch-Mode", "navigate")
