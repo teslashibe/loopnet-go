@@ -1,7 +1,7 @@
 // Package loopnet is a Go client + MCP tool surface for loopnet.com
 // (CoStar Group). There is no public end-user API.
 //
-// Bot protection
+// # Bot protection
 //
 // loopnet.com sits behind Akamai Bot Manager. Plain server-side
 // requests return HTTP 403 (AkamaiGHost) on every path, including
@@ -10,13 +10,23 @@
 // challenge cookies (_abck, bm_sz, ak_bmsc) AND the LoopNet auth
 // cookies set after login — captured from a real Chrome session.
 //
-// Operational note
+// # Capabilities
+//
+// Three surfaces, by Akamai strictness:
+//   - /account/ + /services/* (account, saved listings, watchlists): the
+//     lighter ruleset; served over the stdlib transport (client.go).
+//   - /search/ + /Listing/ (listing search + detail): the strict ruleset.
+//     Served over a Chrome-fingerprinted transport (tlsfetch.go) and parsed
+//     from the SSR HTML (listings.go). These require a browser-fresh Akamai
+//     sensor cookie set; when it is stale the server returns a 403 or a 200
+//     JS-challenge interstitial, both surfaced as ErrBotChallenge so the
+//     caller can prompt a cookie refresh.
+//
+// # Operational note
 //
 // CoStar (LoopNet's owner) actively monitors and litigates automated
-// access to its properties. This client is intentionally read-only,
-// rate-limited (default 1 req / 1.5s), and designed strictly for
-// programmatic use of the authenticated user's own account data.
-// Do NOT enable concurrent fan-out or wide-area crawling against it.
+// access to its properties. This client is rate-limited (default 1 req /
+// 1.5s). Do NOT enable concurrent fan-out or high-volume crawling against it.
 package loopnet
 
 import (
@@ -49,6 +59,11 @@ type Client struct {
 	lastReqAt time.Time
 
 	authMu sync.RWMutex
+
+	// strict is the lazily-initialised Chrome-fingerprinted transport used
+	// for Akamai-protected listing-search / listing-detail pages (see
+	// tlsfetch.go). The stdlib transport above handles everything else.
+	strict strictFetcher
 }
 
 // Option configures a Client.
