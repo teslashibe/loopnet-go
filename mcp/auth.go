@@ -24,13 +24,13 @@ func getMe(ctx context.Context, c *loopnet.Client, _ GetMeInput) (any, error) {
 var authTools = []mcptool.Tool{
 	mcptool.Define[*loopnet.Client, LoginInput](
 		"loopnet_login",
-		"Validate the pasted browser CookieHeader by fetching /myloopnet/ and confirming the dashboard renders.",
+		"Validate the pasted browser CookieHeader by fetching /account/ and confirming the dashboard renders.",
 		"Login",
 		login,
 	),
 	mcptool.Define[*loopnet.Client, GetMeInput](
 		"loopnet_get_me",
-		"Confirm the cached session is alive and return the dashboard title from /myloopnet/.",
+		"Confirm the cached session is alive and return the dashboard title from /account/.",
 		"GetMe",
 		getMe,
 	),
