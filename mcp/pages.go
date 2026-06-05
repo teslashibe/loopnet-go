@@ -9,7 +9,7 @@ import (
 
 // GetPathInput is the typed input for loopnet_get_path.
 type GetPathInput struct {
-	Path string `json:"path" jsonschema:"description=Path under www.loopnet.com (e.g. /account/). Retired /myloopnet/ is remapped to /account/.,required"`
+	Path string `json:"path" jsonschema:"description=Path under www.loopnet.com. Live: /account/ /myloopnet/ (both = dashboard). Saved searches/listings are SPA-only (404).,required"`
 }
 
 func getPath(ctx context.Context, c *loopnet.Client, in GetPathInput) (any, error) {
